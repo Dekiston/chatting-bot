@@ -1,0 +1,27 @@
+{
+  "name": "bot_vk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "commonjs",
+  
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dekiston/Bot_VK.git"
+  },
+  "author": "Dekiston",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dekiston/Bot_VK/issues"
+  },
+  "homepage": "https://github.com/Dekiston/Bot_VK#readme",
+  "dependencies": {
+    "@vk-io/hear": "^1.1.0",
+    "node-vk-bot-api": "^3.5.0",
+    "vk-io": "^4.4.0"
+  }
+}
