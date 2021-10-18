@@ -36,9 +36,9 @@ bot.hear (/^minfo$/, msg => {
 });
 
 bot.hear (/^mclear$/, msg => {
-    fs.writeFileSync(file(Id), "Привет");
+    fs.writeFileSync(file(msg.chatId), "Привет");
     msg.send ("Словарь очищен"); });
-    
+
 bot.hear (/^mc....|mc...$/, msg => {
     fs.writeFileSync(fileChance(msg.chatId), msg.text.slice(3));
     msg.send ('Процент изменен.');
