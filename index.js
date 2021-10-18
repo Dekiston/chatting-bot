@@ -13,6 +13,11 @@ function StatFile (Id) {
         fs.stat(fileChance(Id), function(err) { if (err) { fs.writeFileSync(fileChance(Id), "50");}});
 }
 
+function split (Id) {let array = fs.readFileSync(file(Id), "utf8");
+array = array.split('|');
+array = array.join(' ');
+return array.split(' '); }
+
 function answer (Id) { 
     let array = fs.readFileSync(file(Id), "utf8");
     return array.split('|'); 
@@ -24,8 +29,9 @@ function chance (Id) {return fs.readFileSync(fileChance(Id), "utf8");}
 
 function Upperone (text) {return text.charAt(0).toUpperCase() + text.slice(1)}; //Изменение регистра первой буквы^
 
+
 bot.hear (/^minfo$/, msg => {
-    msg.send ('Шанс сообщения: ' + chance(msg.chatId) + '%\n'
+    msg.send ('Процент сообщений: ' + chance(msg.chatId) + '%\n'
     + 'Строк: ' + answer(msg.chatId).length + '/' + 'Бесконечно?');
 });
 
@@ -38,7 +44,42 @@ bot.hear (/./, msg => {  //msg.text сообщение пользователя 
     let Id = msg.chatId;
     
     StatFile(Id);
-    if (chance(Id) > getRandom(100)) {msg.send(answer(Id)[getRandom(answer(Id).length)])};
+    
+    
+    if (chance(Id) > getRandom(100)) {
+
+        switch(getRandom(5)) {
+            case 0:  
+            msg.send (answer(Id)[getRandom(answer(Id).length)]);
+              break;
+          
+            case 1: 
+            let message = split(Id)[getRandom(answer(Id).length)];
+            let index = getRandom(150);
+            while (message.length < index) { message = message + " , " + split(Id)[getRandom(answer(Id).length)] + " " + answer(Id)[getRandom(answer(Id).length)];}
+            msg.send (Upperone(message.toLowerCase()));
+              break;
+
+            case 2: console.log (2);
+            let message2 = (answer(Id)[getRandom(answer(Id).length)] + ' ' + answer(Id)[getRandom(answer(Id).length)]);
+            msg.send (Upperone(message2.toLowerCase()));
+              break;
+            
+            case 3: console.log (3);
+            let message3 = (answer(Id)[getRandom(answer(Id).length)] + ' ' + split(Id)[getRandom(answer(Id).length)] + " " + answer(Id)[getRandom(answer(Id).length)]);
+            msg.send (Upperone(message3.toLowerCase()));
+              break;
+            
+            case 4: console.log (4);
+            let message4 = split(Id)[getRandom(answer(Id).length)];
+            let index4 = getRandom(25);
+            while (message4.length < index4) { message4 = message4 + " " + split(Id)[getRandom(answer(Id).length)];}
+            msg.send (Upperone(message4.toLowerCase()));
+             break;
+                
+            
+    };}
+
     if (answer(Id).indexOf(Upperone(msg.text)) < 0) { fs.appendFileSync(file(Id), '|' + Upperone(msg.text)); } //запись сообщения в txt файл
     });
 
