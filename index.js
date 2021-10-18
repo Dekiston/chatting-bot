@@ -35,6 +35,10 @@ bot.hear (/^minfo$/, msg => {
     + 'Строк: ' + answer(msg.chatId).length + '/' + 'Бесконечно?');
 });
 
+bot.hear (/^mclear$/, msg => {
+    fs.writeFileSync(file(Id), "Привет");
+    msg.send ("Словарь очищен"); });
+    
 bot.hear (/^mc....|mc...$/, msg => {
     fs.writeFileSync(fileChance(msg.chatId), msg.text.slice(3));
     msg.send ('Процент изменен.');
@@ -48,15 +52,15 @@ bot.hear (/./, msg => {  //msg.text сообщение пользователя 
     
     if (chance(Id) > getRandom(100)) {
 
-        switch(getRandom(5)) {
-            case 0:  
+        switch(getRandom(6)) {
+            case 0:  console.log (0);
             msg.send (answer(Id)[getRandom(answer(Id).length)]);
               break;
           
-            case 1: 
+            case 1: console.log (1);
             let message = split(Id)[getRandom(answer(Id).length)];
             let index = getRandom(150);
-            while (message.length < index) { message = message + " , " + split(Id)[getRandom(answer(Id).length)] + " " + answer(Id)[getRandom(answer(Id).length)];}
+            while (message.length < index) { message = message + "  " + answer(Id)[getRandom(answer(Id).length)];}
             msg.send (Upperone(message.toLowerCase()));
               break;
 
@@ -76,6 +80,10 @@ bot.hear (/./, msg => {  //msg.text сообщение пользователя 
             while (message4.length < index4) { message4 = message4 + " " + split(Id)[getRandom(answer(Id).length)];}
             msg.send (Upperone(message4.toLowerCase()));
              break;
+            
+            case 5: console.log (5);
+            let message5 = split(Id)[getRandom(answer(Id).length)] + "?";
+            msg.send (Upperone(message5.toLowerCase()));
                 
             
     };}
