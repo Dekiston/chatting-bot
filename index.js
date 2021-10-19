@@ -29,6 +29,7 @@ function chance (Id) {return fs.readFileSync(fileChance(Id), "utf8");}
 
 function Upperone (text) {return text.charAt(0).toUpperCase() + text.slice(1)}; //Изменение регистра первой буквы^
 
+bot.hear (/^mhelp$/, msg => {msg.send ("minfo - вывод информации беседы\n" + "mc - изменения процента сообщений");});
 
 bot.hear (/^minfo$/, msg => {
     msg.send ('Процент сообщений: ' + chance(msg.chatId) + '%\n'
