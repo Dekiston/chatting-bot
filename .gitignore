@@ -1,3 +1,5 @@
 /node_modules/
 dictionary*.json
+dictionary*.txt
+procent*.txt
 .DS_Store
