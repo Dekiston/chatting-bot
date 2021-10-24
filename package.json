@@ -5,7 +5,7 @@
   "main": "index2.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index2.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
