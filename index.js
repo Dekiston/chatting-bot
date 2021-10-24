@@ -102,9 +102,7 @@ bot.hear (/./, msg => {  //msg.text сообщение пользователя 
             break;         
               }; } 
 
-    Az.Morph.init(function() {
-      let parses = Az.Morph(msg.text)[0].tag;
-      console.log(parses.POST, parses.GNdr); })
+    
 
     if (answer(Id).indexOf(Upperone(msg.text)) < 0) { fs.appendFileSync(file(Id), '|' + Upperone(msg.text)); } //запись сообщения в txt файл
     })
