@@ -61,54 +61,30 @@ bot.hear (/./, context => {  //любое сообщение
     let message = context.text.split(" "); //деление сообщения на слова
 
     for (let word of message) {
-        
-        console.log (word + "1");
-        
-        
+
         if (/[,.!?;:()]/.test(word[word.length-1])) {word = word.slice(0,-1);} //проверка на знаки препинания в конце слова
-        console.log (word + "2");
         if (/[,.!?;:()]/.test(word)) {continue;} //пропуск одиночных знаков препинания
- 
-        console.log (word);
-        
+
         Az.Morph.init(function() {let part = Az.Morph(word)[0].tag; //морфологический разбор слова
             let object = fs.readFileSync(fileDict(Id, part.POST));
                 object = JSON.parse(object); //обьект  - 1 -
 
-                const existingWord = object.words.filter((obj) => obj.word === word);
+                const existingWord = object.words.filter((obj) => obj.word === word); //проверка одинаковых слов
                 if (existingWord.length > 0) { return; } 
-
 
             let property = {
                 word: word, //слово
                 GNdr: part.GNdr, //род
                 NMbr: part.NMbr //ед. множ. число
             }
-            console.log (property);
-            
-
             
                 object.words.push(property); //добавление данных - 2 -
             let json = JSON.stringify(object); //обратно в JSON
                 fs.writeFileSync(fileDict(Id, part.POST), json); 
-            
-            
-        
         });
     }
 
-
-    
-
-
-
-
-
-
-
-    if (procent(Id) > getRandom(100)) {
-
-    }
+    if (procent(Id) > getRandom(100)) { }
 
 
 })
