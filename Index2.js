@@ -9,27 +9,9 @@ vk.updates.on('message', bot.middleware);
 function fileDict(Id, part = "") {return ("dictionary" + part + Id + ".JSON");} //название файла
 function fileProcent(Id) {return ("procent" + Id + ".txt");}  //название файла процента
 
-function StatusFiles (Id) { //создание файлов беседы
-  fs.stat(fileDict(Id), function(err) { if (err) { 
-        fs.writeFileSync(fileDict(Id), '{ "words": [] }'); //общая
-        fs.writeFileSync(fileDict(Id, "NOUN"), '{ "words": [] }'); //существительные
-        fs.writeFileSync(fileDict(Id, "VERB"), '{ "words": [] }'); //глаголы
-        fs.writeFileSync(fileDict(Id, "ADJF"), '{ "words": [] }'); //прилагательные (полные)
-        fs.writeFileSync(fileDict(Id, "ADJS"), '{ "words": [] }'); //прилагательные
-        fs.writeFileSync(fileDict(Id, "PREP"), '{ "words": [] }'); //предлог
-        fs.writeFileSync(fileDict(Id, "INTJ"), '{ "words": [] }'); //междометия
-        fs.writeFileSync(fileDict(Id, "PRCL"), '{ "words": [] }'); //частицы
-        fs.writeFileSync(fileDict(Id, "INFN"), '{ "words": [] }'); //инфинитив
-        fs.writeFileSync(fileDict(Id, "LATN"), '{ "words": [] }'); //английский
-        fs.writeFileSync(fileDict(Id, "PRTF"), '{ "words": [] }'); //причастие (полное)
-        fs.writeFileSync(fileDict(Id, "PRTS"), '{ "words": [] }'); //причастие (краткое)
-        fs.writeFileSync(fileDict(Id, "ADVB"), '{ "words": [] }'); //наречие
-        fs.writeFileSync(fileDict(Id, "GRND"), '{ "words": [] }'); //деепричастие
-        fs.writeFileSync(fileDict(Id, "NUMB"), '{ "words": [] }'); //числа
-        fs.writeFileSync(fileDict(Id, "CONJ"), '{ "words": [] }'); //союз
-        fs.writeFileSync(fileDict(Id, "NPRO"), '{ "words": [] }'); //местоимение-существительное
-    }});
-    fs.stat(fileProcent(Id), function(err) { if (err) { fs.writeFileSync(fileProcent(Id), "50");}});} //процент
+async function StatusFiles (Id, part) { //создание файлов беседы
+  fs.stat( fileDict(Id,part),  function(err) { if (err) { fs.writeFileSync(fileDict(Id, part), '{ "words": [] }');}}); //слова
+    fs.stat(fileProcent(Id), function(err) { if (err) { fs.writeFile(fileProcent(Id), "50");}});} //процент
 
 function Upperone (text) {return text.charAt(0).toUpperCase() + text.slice(1)}; //Изменение регистра первой буквы^
 
@@ -41,11 +23,12 @@ bot.hear (/^mhelp$/, context => {context.send ("minfo - вывод информ�
 
 bot.hear (/^minfo$/, context => { //информация по беседе
     context.send ('Процент сообщений: ' + procent(context.chatId) + '%\n'
-    + 'Строк: ' + answer(context.chatId).length + '/' + 'Бесконечно?');
+    + 'Строк: ' + answer(context.chatId).length + '/' + 'Бесконечно?\n'
+    + 'Версия Малютки 0.9');
 });
 
 bot.hear (/^mclear$/, context => { //очистка файлов
-    fs.writeFileSync(file(context.chatId), "Привет");
+    fs.writeFileSync(file(context.chatId), " ");
     context.send ("Словарь очищен"); });
 
 bot.hear (/^mc....|mc...$/, context => { //изменение процента ответов
@@ -56,7 +39,7 @@ bot.hear (/^mc....|mc...$/, context => { //изменение процента �
 bot.hear (/./, context => {  //любое сообщение
     let Id = context.chatId; //Id чата
     
-    StatusFiles(Id); //проверка существования файлов
+    
 
     let message = context.text.split(" "); //деление сообщения на слова
 
@@ -65,7 +48,10 @@ bot.hear (/./, context => {  //любое сообщение
         if (/[,.!?;:()]/.test(word[word.length-1])) {word = word.slice(0,-1);} //проверка на знаки препинания в конце слова
         if (/[,.!?;:()]/.test(word)) {continue;} //пропуск одиночных знаков препинания
 
-        Az.Morph.init(function() {let part = Az.Morph(word)[0].tag; //морфологический разбор слова
+        Az.Morph.init(async function() {let part = Az.Morph(word)[0].tag; //морфологический разбор слова
+            
+            await StatusFiles(Id, part.POST);
+
             let object = fs.readFileSync(fileDict(Id, part.POST));
                 object = JSON.parse(object); //обьект  - 1 -
 
@@ -84,7 +70,7 @@ bot.hear (/./, context => {  //любое сообщение
         });
     }
 
-    if (procent(Id) > getRandom(100)) { }
+    if (procent(Id) > getRandom(100)) { context.send("1");}
 
 
 })
