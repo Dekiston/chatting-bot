@@ -2,64 +2,73 @@ const { VK, MessageContext } = require('vk-io');
 const  { HearManager } = require('@vk-io/hear');
 const Az = require('az');
 const fs = require("fs");
-
+const { get } = require('http');
 const vk = new VK({ token: '0f181d9eefc80b8695f008aef4a5cde8fac5e29667d051cfcec62e0c5fb21d2c04cc1ea01ab91c38cecc5'});
 const bot = new HearManager(); 
 vk.updates.on('message', bot.middleware);
 
 function fileDict(Id, part = "") {return ("dictionary" + part + Id + ".JSON");} //название файла
-function fileProcent(Id) {return ("procent" + Id + ".txt");}  //название файла процента
+function fileProcent(Id) {return ("info" + Id + ".txt");}  //название файла 
 
 async function StatusFiles (Id, part) { //создание файлов беседы
   fs.stat( fileDict(Id,part),  function(err) { if (err) { fs.writeFileSync(fileDict(Id, part), '{ "words": [] }');}}); //слова
-    fs.stat(fileProcent(Id), function(err) { if (err) { fs.writeFile(fileProcent(Id), "50");}});} //процент
+    fs.stat(fileProcent(Id), function(err) { if (err) { fs.writeFile(fileProcent(Id), "procent: 100\nwords: 0");}});
+} //процент
+
+
 
 function Upperone (text) {return text.charAt(0).toUpperCase() + text.slice(1)}; //Изменение регистра первой буквы^
 
 function getRandom (max) {return Math.floor(Math.random() * max)}; //случайное число
 
 
-function fileChoice (Id, part) {
+function fileChoice (Id, part, Gender, Number) {
 let object = fs.readFileSync(fileDict(Id, part), "utf8");
-object = JSON.parse(object).words; //слово из коллекции
+object = JSON.parse(object).words;
 let index = object.length - 1;
-return object[getRandom(index)].word;
+let lastWord = object[getRandom(index)];
+while (lastWord.GNdr != Gender && lastWord.NMbr != Number) {
+    lastWord = object[getRandom(index)];
+}
+return lastWord.word;
+
 }; //чтение коллекции
 
-function procent (Id) {return fs.readFileSync(fileProcent(Id), "utf8");} //чтение процента из файла
+function procent (Id) {let procent = [];
+    procent.push(fs.readFileSync(fileProcent(Id), "utf8"));
+return procent[0].slice(8,12); } //чтение процента из файла
+
 const DICT = ["NOUN", "ADJF", "ADJS", "COMP", "VERB", "INFN", "PRTF", "PRTS", "GRND", "NUMR", "ADVB", "NPRO", "PRED", "PREP", "CONJ", "PRCL", "INTJ"];
 
-bot.hear (/^mhelp$/, context => {context.send ("minfo - вывод информации беседы\n" + "mc - изменения процента сообщений\n" + "mclear - сброс данных");});   //легенда
+bot.hear (/^mhelp$/, context => {context.send ("minfo - вывод информации беседы\n" + "mp - изменения процента сообщений\n");});   //легенда
 
 bot.hear (/^minfo$/, context => { //информация по беседе
-    context.send ('Процент сообщений: ' + procent(context.chatId) + '%\n'
-    + 'Строк: ' + answer(context.chatId).length + '/' + 'Бесконечно?\n'
-    + 'Версия Малютки 0.9');
+    context.send (fs.readFileSync(fileProcent(context.chatId), "utf8"));
 });
 
-bot.hear (/^mclear$/, context => { //очистка файлов
-    fs.writeFileSync(file(context.chatId), " ");
-    context.send ("Словарь очищен"); });
+bot.hear (/^mclear$/, context => { //очистка файлов®
+        context.send ("Не очищено.");
+     });
 
-bot.hear (/^mc....|mc...$/, context => { //изменение процента ответов
-    fs.writeFileSync(fileProcent(context.chatId), context.text.slice(3));
+bot.hear (/^mp....|mp...$/, context => { //изменение процента ответов
+    let procent = fs.readFileSync(fileProcent(context.chatId), "utf8");
+    let lastProcent = procent.slice(9,12);
+    procent = procent.replace (lastProcent, context.text.slice(3));
+    fs.writeFileSync(fileProcent(context.chatId), procent);
     context.send ('Процент изменен.');
 }); //изменение процента
 
-bot.hear (/./, context => {  //любое сообщение
-
+bot.hear (/./, async context => {  //любое сообщение
     let Id = context.chatId; //Id чата
     
     let message = context.text.split(" "); //деление сообщения на слова
 
     for (let word of message) {
-        word = Upperone(word);
-
+        
         if (/[,.!?;:()]/.test(word[word.length-1])) {word = word.slice(0,-1);} //проверка на знаки препинания в конце слова
         if (/[,.!?;:()]/.test(word)) {continue;} //пропуск одиночных знаков препинания
 
         Az.Morph.init(async function() {let part = Az.Morph(word)[0].tag; //морфологический разбор слова
-            
             await StatusFiles(Id, part.POST); //проверка на существование файлов беседы
 
             let object = fs.readFileSync(fileDict(Id, part.POST));
@@ -82,34 +91,52 @@ bot.hear (/./, context => {  //любое сообщение
 
     if (procent(Id) > getRandom(100)) { 
 
+const Genders = ["masc", "femn", "neut"];
+let Gender = Genders[getRandom(3)];
+const Numbers = ["plur", "sing"];
+let Number = Numbers[getRandom(2)];
 
-        switch(getRandom(3)) {
-            
+ let message;
 
-            case 1: console.log (1);
-                context.send(fileChoice(Id, "NOUN"));
+ switch(getRandom(3)) {
+
+            case 0: console.log (0);
+            message = fileChoice(Id, "NOUN", Gender, Number) + ' ' + fileChoice(Id, "VERB", Gender, Number);
+            message = Upperone(message.toLowerCase());
+            context.send (message);
               break;
           
 
-            case 2: console.log (2);
-            context.send(fileChoice(Id, "VERB"));
+            case 1: console.log (1);
+            message = fileChoice(Id, "VERB", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number);
+            message = Upperone(message.toLowerCase());
+            context.send (message);
               break;
 
-              case 3: console.log (3);
-            context.send(fileChoice(Id, "VERB"));
-              break;
+              case 2: console.log (2);
+            message = fileChoice(Id, "NPRO", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number) + ' и ' + fileChoice(Id, "VERB", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number);
+            message = Upperone(message.toLowerCase());
+            context.send (message);  
+            break;
 
         }
 
-
-
-
-
 }
-
 
 })
 
+bot.onFallback((context) => {
+    switch(getRandom(5)) {
+
+        case 0: console.log ('2.0');
+                context.send ("АХАХАХАХА");
+                break;
+
+        case 1: console.log ('2.1');
+                vk.api.messages.send({peer_id: context.peerId, sticker_id: 163, random_id: 0});
+                break;        
+    
+    }})// Обработчик, если команда не существует
 
 console.log('Бот запущен!');
 vk.updates.start().catch(console.error);
