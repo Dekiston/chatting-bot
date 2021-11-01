@@ -46,7 +46,7 @@ bot.hear (/^minfo$/, context => { //информация по беседе
     context.send (fs.readFileSync(fileProcent(context.chatId), "utf8"));
 });
 
-bot.hear (/^mclear$/, context => { //очистка файлов®
+bot.hear (/^mclear$/, context => { //очистка файлов
         context.send ("Не очищено.");
      });
 

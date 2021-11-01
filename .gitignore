@@ -1,7 +1,6 @@
 /node_modules/
 dictionary*.json
 dictionary*.txt
-procent*.txt
 info*.txt
 index.js
 .DS_Store
