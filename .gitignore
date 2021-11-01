@@ -1,6 +1,7 @@
 /node_modules/
 dictionary*.json
 dictionary*.txt
+index2.js
 info*.txt
 index.js
 .DS_Store

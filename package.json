@@ -2,7 +2,7 @@
   "name": "bot_vk",
   "version": "1.0.0",
   "description": "",
-  "main": "index2.js",
+  "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "start": "node index2.js",

@@ -1,114 +1,160 @@
-const Az = require('az');
 const { VK, MessageContext } = require('vk-io');
 const  { HearManager } = require('@vk-io/hear');
+const Az = require('az');
 const fs = require("fs");
+const { get } = require('http');
 const vk = new VK({ token: '0f181d9eefc80b8695f008aef4a5cde8fac5e29667d051cfcec62e0c5fb21d2c04cc1ea01ab91c38cecc5'});
 const bot = new HearManager(); 
 vk.updates.on('message', bot.middleware);
 
-function file (Id) {return ("dictionary" + Id +".txt");}
-function fileChance(Id) {return ("chance" + Id + ".txt");}
+function fileDict(Id, part = "") {return ("dictionary" + part + Id + ".JSON");} //название файла
+function fileProcent(Id) {return ("info" + Id + ".txt");}  //название файла 
 
-function StatFile (Id) {
-    fs.stat(file(Id), function(err) { if (err) { fs.writeFileSync(file(Id), "Привет");}});
-        fs.stat(fileChance(Id), function(err) { if (err) { fs.writeFileSync(fileChance(Id), "50");}});
-}
+async function StatusFiles (Id, part) { //создание файлов беседы
+  fs.stat( fileDict(Id,part),  function(err) { if (err) { fs.writeFileSync(fileDict(Id, part), '{ "words": [] }');}}); //слова
+    fs.stat(fileProcent(Id), function(err) { if (err) { fs.writeFile(fileProcent(Id), "procent: 100\nwords: 0");}});
+} //процент
 
-function split (Id) {let array = fs.readFileSync(file(Id), "utf8");
-array = array.split('|');
-array = array.join(' ');
-return array.split(' '); }
 
-function answer (Id) { 
-    let array = fs.readFileSync(file(Id), "utf8");
-    return array.split('|'); 
-}; //чтение txt файла
-
-function getRandom (max) {return Math.floor(Math.random() * max)};
-
-function chance (Id) {return fs.readFileSync(fileChance(Id), "utf8");}
 
 function Upperone (text) {return text.charAt(0).toUpperCase() + text.slice(1)}; //Изменение регистра первой буквы^
 
-bot.hear (/^mhelp$/, msg => {msg.send ("minfo - вывод информации беседы\n" + "mc - изменения процента сообщений");});
+function getRandom (max) {return Math.floor(Math.random() * max)}; //случайное число
 
-bot.hear (/^minfo$/, msg => {
-    msg.send ('Процент сообщений: ' + chance(msg.chatId) + '%\n'
-    + 'Строк: ' + answer(msg.chatId).length + '/' + 'Бесконечно?');
+
+function fileChoice (Id, part, Gender, Number) {
+let object = fs.readFileSync(fileDict(Id, part), "utf8");
+object = JSON.parse(object).words;
+let index = object.length - 1;
+let lastWord = object[getRandom(index)];
+while (lastWord.GNdr != Gender && lastWord.NMbr != Number) {
+    lastWord = object[getRandom(index)];
+}
+return lastWord.word;
+
+}; //чтение коллекции
+
+function procent (Id) {let procent = [];
+    procent.push(fs.readFileSync(fileProcent(Id), "utf8"));
+return procent[0].slice(8,12); } //чтение процента из файла
+
+const DICT = ["NOUN", "ADJF", "ADJS", "COMP", "VERB", "INFN", "PRTF", "PRTS", "GRND", "NUMR", "ADVB", "NPRO", "PRED", "PREP", "CONJ", "PRCL", "INTJ"];
+
+bot.hear (/^mhelp$/, context => {context.send ("minfo - вывод информации беседы\n" + "mp - изменения процента сообщений\n");});   //легенда
+
+bot.hear (/^minfo$/, context => { //информация по беседе
+    context.send (fs.readFileSync(fileProcent(context.chatId), "utf8"));
 });
 
-bot.hear (/^mclear$/, msg => {
-    fs.writeFileSync(file(msg.chatId), "Привет");
-    msg.send ("Словарь очищен"); });
+bot.hear (/^mclear$/, context => { //очистка файлов
+        context.send ("Не очищено.");
+     });
 
-bot.hear (/^mc....|mc...$/, msg => {
-    fs.writeFileSync(fileChance(msg.chatId), msg.text.slice(3));
-    msg.send ('Процент изменен.');
+bot.hear (/^mp....|mp...$/, context => { //изменение процента ответов
+    let procent = fs.readFileSync(fileProcent(context.chatId), "utf8");
+    let lastProcent = procent.slice(9,12);
+    procent = procent.replace (lastProcent, context.text.slice(3));
+    fs.writeFileSync(fileProcent(context.chatId), procent);
+    context.send ('Процент изменен.');
 }); //изменение процента
 
-
-bot.hear (/./, msg => {  //msg.text сообщение пользователя Searchfile(msg.chatId)
-    let Id = msg.chatId;
+bot.hear (/./, async context => {  //любое сообщение
+    let Id = context.chatId; //Id чата
     
-    StatFile(Id);
-  
-    if (chance(Id) > getRandom(100)) {
+    let message = context.text.split(" "); //деление сообщения на слова
 
-        switch(getRandom(12)) {
-          
-            case 1:
-            console.log (0);
-            msg.send (answer(Id)[getRandom(answer(Id).length)]);
-              break;
-          
-            case 2:
-            case 3: console.log (1);
-            let message = split(Id)[getRandom(answer(Id).length)];
-            let index = getRandom(150);
-            while (message.length < index) { message = message + "  " + answer(Id)[getRandom(answer(Id).length)];}
-            msg.send (Upperone(message.toLowerCase()));
-              break;
+    for (let word of message) {
+        
+        if (/[,.!?;:()]/.test(word[word.length-1])) {word = word.slice(0,-1);} //проверка на знаки препинания в конце слова
+        if (/[,.!?;:()]/.test(word)) {continue;} //пропуск одиночных знаков препинания
 
-            case 4: console.log (2);
-            let message2 = (answer(Id)[getRandom(answer(Id).length)] + ' ' + answer(Id)[getRandom(answer(Id).length)]);
-            msg.send (Upperone(message2.toLowerCase()));
-              break;
+        Az.Morph.init(async function() {let part = Az.Morph(word)[0].tag; //морфологический разбор слова
+            await StatusFiles(Id, part.POST); //проверка на существование файлов беседы
+
+            let object = fs.readFileSync(fileDict(Id, part.POST));
+                object = JSON.parse(object); //обьект  - 1 -
+
+                const existingWord = object.words.filter((obj) => obj.word === word); //проверка одинаковых слов
+                if (existingWord.length > 0) { return; } 
+
+            let property = {
+                word: word, //слово
+                GNdr: part.GNdr, //род
+                NMbr: part.NMbr //ед. множ. число
+            }
             
-            case 5:
-            case 6: console.log (3);
-            let message3 = (answer(Id)[getRandom(answer(Id).length)] + ' ' + split(Id)[getRandom(answer(Id).length)] + " " + answer(Id)[getRandom(answer(Id).length)]);
-            msg.send (Upperone(message3.toLowerCase()));
+                object.words.push(property); //добавление данных - 2 -
+            let json = JSON.stringify(object); //обратно в JSON
+                fs.writeFileSync(fileDict(Id, part.POST), json); 
+        });
+    }
+
+    if (procent(Id) > getRandom(100)) { 
+
+const Genders = ["masc", "femn", "neut"];
+let Gender = Genders[getRandom(3)];
+const Numbers = ["plur", "sing"];
+let Number = Numbers[getRandom(2)];
+
+ let message;
+
+ switch(getRandom(3)) {
+
+            case 0: console.log (0);
+            message = fileChoice(Id, "NOUN", Gender, Number) + ' ' + fileChoice(Id, "VERB", Gender, Number);
+            message = Upperone(message.toLowerCase());
+            context.send (message);
+              break;
+          
+
+            case 1: console.log (1);
+            message = fileChoice(Id, "VERB", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number);
+            message = Upperone(message.toLowerCase());
+            context.send (message);
               break;
 
-            case 7:
-            case 8:
-            case 9:
-            case 10: console.log (4);
-            let message4 = split(Id)[getRandom(answer(Id).length)];
-            let index4 = getRandom(25);
-            while (message4.length < index4) { message4 = message4 + " " + split(Id)[getRandom(answer(Id).length)];}
-            msg.send (Upperone(message4.toLowerCase()));
-             break;
-            
-            case 11: console.log (5);
-            let message5 = split(Id)[getRandom(answer(Id).length)] + "?";
-            msg.send (Upperone(message5.toLowerCase()));
+              case 2: console.log (2);
+            message = fileChoice(Id, "NPRO", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number) + ' и ' + fileChoice(Id, "VERB", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number);
+            message = Upperone(message.toLowerCase());
+            context.send (message);  
             break;
 
-            case 12: console.log (6);
-            if (getRandom(10) < 8) {
-            vk.api.messages.send({peer_id: msg.peerId, sticker_id: 163, random_id: 0})} else {
-            vk.api.messages.send({peer_id: msg.peerId, sticker_id: getRandom(200), random_id: 0})};
-            break;         
-              }; } 
+        }
 
+}
+
+})
+
+bot.onFallback((context) => {
+    switch(getRandom(5)) {
+
+        case 0: console.log ('2.0');
+                context.send ("АХАХАХАХА");
+                break;
+
+        case 1: console.log ('2.1');
+                vk.api.messages.send({peer_id: context.peerId, sticker_id: 163, random_id: 0});
+                break;        
     
-
-    if (answer(Id).indexOf(Upperone(msg.text)) < 0) { fs.appendFileSync(file(Id), '|' + Upperone(msg.text)); } //запись сообщения в txt файл
-    })
-
-    bot.onFallback((context) => {context.send ("Ты что высрал, пес?")})// Обработчик, если команда не существует
-
+    }})// Обработчик, если команда не существует
 
 console.log('Бот запущен!');
 vk.updates.start().catch(console.error);
+
+//NOUN	имя существительное	хомяк
+//ADJF	имя прилагательное (полное)	хороший
+//ADJS	имя прилагательное (краткое)	хорош
+//COMP	компаратив	лучше, получше, выше
+//VERB	глагол (личная форма)	говорю, говорит, говорил
+//INFN	глагол (инфинитив)	говорить, сказать
+//PRTF	причастие (полное)	прочитавший, прочитанная
+//PRTS	причастие (краткое)	прочитана
+//GRND	деепричастие	прочитав, рассказывая
+//NUMR	числительное	три, пятьдесят
+//ADVB	наречие	круто
+//NPRO	местоимение-существительное	он
+//PRED	предикатив	некогда
+//PREP	предлог	в
+//CONJ	союз	и
+//PRCL	частица	бы, же, лишь
+//INTJ  число
