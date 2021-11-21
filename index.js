@@ -3,16 +3,20 @@ const  { HearManager } = require('@vk-io/hear');
 const Az = require('az');
 const fs = require("fs");
 const { get } = require('http');
-const vk = new VK({ token: '0f181d9eefc80b8695f008aef4a5cde8fac5e29667d051cfcec62e0c5fb21d2c04cc1ea01ab91c38cecc5'});
+const vk = new VK({ token: '937a07a228fdf17ec8049f4943b5ffa0168147655c4dbc9fefc13d0c55527a71e82c6b71c33d52c251195'});
 const bot = new HearManager(); 
 vk.updates.on('message', bot.middleware);
 
-function fileDict(Id, part = "") {return ("dictionary" + part + Id + ".JSON");} //название файла
+function fileDict(Id) {return ("dictionary" + Id + ".JSON");} //название файла
 function fileProcent(Id) {return ("info" + Id + ".txt");}  //название файла 
 
-async function StatusFiles (Id, part) { //создание файлов беседы
-  fs.stat( fileDict(Id,part),  function(err) { if (err) { fs.writeFileSync(fileDict(Id, part), '{ "words": [] }');}}); //слова
-    fs.stat(fileProcent(Id), function(err) { if (err) { fs.writeFile(fileProcent(Id), "procent: 100\nwords: 0");}});
+
+async function StatusFiles (Id) { //создание файлов беседы
+    fs.stat(fileProcent(Id), function(err) { if (err) { fs.writeFileSync(fileProcent(Id), 'procent: 100\nwords: 0');}});
+    fs.stat(fileDict(Id),  function(err) { if (err) { fs.writeFileSync(fileDict(Id), '{ "words": [] }');}}) //слова
+    
+  
+    
 } //процент
 
 
@@ -22,8 +26,8 @@ function Upperone (text) {return text.charAt(0).toUpperCase() + text.slice(1)}; 
 function getRandom (max) {return Math.floor(Math.random() * max)}; //случайное число
 
 
-function fileChoice (Id, part, Gender, Number) {
-let object = fs.readFileSync(fileDict(Id, part), "utf8");
+function fileChoice (Id, Gender, Number) {
+let object = fs.readFileSync(fileDict(Id), "utf8");
 object = JSON.parse(object).words;
 let index = object.length - 1;
 let lastWord = object[getRandom(index)];
@@ -31,7 +35,6 @@ while (lastWord.GNdr != Gender && lastWord.NMbr != Number) {
     lastWord = object[getRandom(index)];
 }
 return lastWord.word;
-
 }; //чтение коллекции
 
 function procent (Id) {let procent = [];
@@ -58,26 +61,28 @@ bot.hear (/^mp....|mp...$/, context => { //изменение процента �
     context.send ('Процент изменен.');
 }); //изменение процента
 
+
 bot.hear (/./, async context => {  //любое сообщение
     let Id = context.chatId; //Id чата
     
     let message = context.text.split(" "); //деление сообщения на слова
 
     for (let word of message) {
-        
         if (/[,.!?;:()]/.test(word[word.length-1])) {word = word.slice(0,-1);} //проверка на знаки препинания в конце слова
         if (/[,.!?;:()]/.test(word)) {continue;} //пропуск одиночных знаков препинания
 
         Az.Morph.init(async function() {let part = Az.Morph(word)[0].tag; //морфологический разбор слова
-            await StatusFiles(Id, part.POST); //проверка на существование файлов беседы
+            await StatusFiles(Id); //проверка на существование файлов беседы
+            
 
-            let object = fs.readFileSync(fileDict(Id, part.POST));
+            let object = fs.readFileSync(fileDict(Id));
                 object = JSON.parse(object); //обьект  - 1 -
 
                 const existingWord = object.words.filter((obj) => obj.word === word); //проверка одинаковых слов
                 if (existingWord.length > 0) { return; } 
 
             let property = {
+                POST: part.POST,
                 word: word, //слово
                 GNdr: part.GNdr, //род
                 NMbr: part.NMbr //ед. множ. число
@@ -85,7 +90,7 @@ bot.hear (/./, async context => {  //любое сообщение
             
                 object.words.push(property); //добавление данных - 2 -
             let json = JSON.stringify(object); //обратно в JSON
-                fs.writeFileSync(fileDict(Id, part.POST), json); 
+                fs.writeFileSync(fileDict(Id), json); 
         });
     }
 
@@ -98,26 +103,14 @@ let Number = Numbers[getRandom(2)];
 
  let message;
 
- switch(getRandom(3)) {
+ switch(getRandom(1)) {
 
             case 0: console.log (0);
-            message = fileChoice(Id, "NOUN", Gender, Number) + ' ' + fileChoice(Id, "VERB", Gender, Number);
+            message = fileChoice(Id, Gender, Number);
+            for (let i = 0; i < (getRandom(10) + 2); i++) {message = message + ' ' + fileChoice(Id, Gender, Number);};    
             message = Upperone(message.toLowerCase());
             context.send (message);
               break;
-          
-
-            case 1: console.log (1);
-            message = fileChoice(Id, "VERB", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number);
-            message = Upperone(message.toLowerCase());
-            context.send (message);
-              break;
-
-              case 2: console.log (2);
-            message = fileChoice(Id, "NPRO", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number) + ' и ' + fileChoice(Id, "VERB", Gender, Number) + ' ' + fileChoice(Id, "NOUN", Gender, Number);
-            message = Upperone(message.toLowerCase());
-            context.send (message);  
-            break;
 
         }
 
