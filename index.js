@@ -1,8 +1,11 @@
-const { VK, MessageContext } = require("vk-io");
+const { VK } = require("vk-io");
 const { HearManager } = require("@vk-io/hear");
 const Az = require("az");
 const fs = require("fs");
-const { get } = require("http");
+const { JSDOM } = require( "jsdom" );
+const { window } = new JSDOM( "" );
+const $ = require( "jquery" )( window );
+const yaspeller = require("yandex-speller");
 const vk = new VK({
   token:
     "937a07a228fdf17ec8049f4943b5ffa0168147655c4dbc9fefc13d0c55527a71e82c6b71c33d52c251195",
@@ -47,7 +50,7 @@ function fileChoice(Id, Gender, Number) {
   let OneWord = object[getRandom(index)];
   while ((OneWord.GNdr != Gender || OneWord.NMbr != Number) && num < 10) {
     OneWord = object[getRandom(index)];
-    num += 1;
+    num = num + 1;
   }
   console.log(OneWord);
   return OneWord.word;
@@ -59,23 +62,25 @@ function procent(Id) {
   return procent[0].slice(8, 12);
 } //чтение процента из файла
 
-bot.hear(/^mhelp$/, (context) => {
+
+
+bot.hear(/^mhelp$/i, (context) => {
   context.send(
     "minfo - вывод информации беседы\n" + "mp - изменения процента сообщений\n"
   );
 }); //легенда
 
-bot.hear(/^minfo$/, (context) => {
+bot.hear(/^minfo$/i, (context) => {
   //информация по беседе
   context.send(fs.readFileSync(fileProcent(context.chatId), "utf8"));
 });
 
-bot.hear(/^mclear$/, (context) => {
+bot.hear(/^mclear$/i, (context) => {
   //очистка файлов
   context.send("Не очищено.");
 });
 
-bot.hear(/^mp....|mp...$/, (context) => {
+bot.hear(/^mp....|mp...$/i, (context) => {
   //изменение процента ответов
   let procent = fs.readFileSync(fileProcent(context.chatId), "utf8");
   let lastProcent = procent.slice(9, 12);
@@ -97,6 +102,11 @@ bot.hear(/./, async (context) => {
     if (/[,.!?;:()]/.test(word)) {
       continue;
     } //пропуск одиночных знаков препинания
+    word = Upperone(word.toLowerCase());
+    console.log (word);
+    
+ 
+    console.log (word);
 
     Az.Morph.init(async function () {
       try {
@@ -115,7 +125,7 @@ bot.hear(/./, async (context) => {
           word: word, //слово
           GNdr: part.GNdr, //род
           NMbr: part.NMbr, //ед. множ. число
-          СAse: part.CAse,
+          СAse: part.CAse, //падеж
         };
 
         object.words.push(property); //добавление данных - 2 -
@@ -135,7 +145,7 @@ bot.hear(/./, async (context) => {
       case 0:
         console.log(0);
         message = fileChoice(Id, Genders[getRandom(3)], Numbers[getRandom(2)]);
-        for (let i = 0; i < getRandom(8) + 1; i++) {
+        for (let i = 0; i < getRandom(4) + 1; i++) {
           message = message + " " + fileChoice(Id, Genders[getRandom(3)]);
         }
         message = Upperone(message.toLowerCase());

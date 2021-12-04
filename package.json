@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "type": "commonjs",
+
   "scripts": {
-    "start": "node index2.js",
+    "start": "node index.js",
+    "yaspeller": "yaspeller .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,8 +24,15 @@
     "@vk-io/hear": "^1.1.0",
     "az": "^0.2.3",
     "heroku": "^7.59.0",
+    "jquery": "^3.6.0",
+    "jsdom": "^19.0.0",
     "node-vk-bot-api": "^3.5.0",
     "synaptic": "^1.1.4",
-    "vk-io": "^4.4.0"
+    "vk-io": "^4.4.0",
+    "yandex-speller": "^4.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "gulp-run": "^1.7.1"
   }
 }
