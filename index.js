@@ -2,10 +2,7 @@ const { VK } = require("vk-io");
 const { HearManager } = require("@vk-io/hear");
 const Az = require("az");
 const fs = require("fs");
-const { JSDOM } = require( "jsdom" );
-const { window } = new JSDOM( "" );
-const $ = require( "jquery" )( window );
-const yaspeller = require("yandex-speller");
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const vk = new VK({
   token:
     "937a07a228fdf17ec8049f4943b5ffa0168147655c4dbc9fefc13d0c55527a71e82c6b71c33d52c251195",
@@ -52,7 +49,7 @@ function fileChoice(Id, Gender, Number) {
     OneWord = object[getRandom(index)];
     num = num + 1;
   }
-  console.log(OneWord);
+  //console.log(OneWord);
   return OneWord.word;
 } //чтение коллекции
 
@@ -62,6 +59,20 @@ function procent(Id) {
   return procent[0].slice(8, 12);
 } //чтение процента из файла
 
+function speller (message) {
+  let newmessage = [];
+  for (let word of message) {
+  let xhr = new XMLHttpRequest();
+  let url = new URL ("https://speller.yandex.net/services/spellservice.json/checkText?text=" + word);
+  xhr.open("GET", url, false);
+  xhr.send();
+  let answer =  JSON.parse(xhr.responseText);
+  if (!answer[0]) {newmessage.push (word)}
+  else {newmessage.push (answer[0].s[0])}
+  }
+     newmessage.join(" ");
+     return newmessage;  
+}
 
 
 bot.hear(/^mhelp$/i, (context) => {
@@ -76,8 +87,11 @@ bot.hear(/^minfo$/i, (context) => {
 });
 
 bot.hear(/^mclear$/i, (context) => {
-  //очистка файлов
-  context.send("Не очищено.");
+  fs.unlink (fileProcent(context.chatId), (err) => {
+    if (err) { console.log('path/file.txt was deleted');}});
+  fs.unlink (fileDict(context.chatId), (err) => {
+    if (err) { console.log('path/file.txt was deleted');}});
+  context.send("Очищено.");
 });
 
 bot.hear(/^mp....|mp...$/i, (context) => {
@@ -94,8 +108,10 @@ bot.hear(/./, async (context) => {
   let Id = context.chatId; //Id чата
 
   let message = context.text.split(" "); //деление сообщения на слова
-
-  for (let word of message) {
+  
+  message = speller (message);
+  
+   for (let word of message) {
     if (/[,.!?;:()]/.test(word[word.length - 1])) {
       word = word.slice(0, -1);
     } //проверка на знаки препинания в конце слова
@@ -103,10 +119,6 @@ bot.hear(/./, async (context) => {
       continue;
     } //пропуск одиночных знаков препинания
     word = Upperone(word.toLowerCase());
-    console.log (word);
-    
- 
-    console.log (word);
 
     Az.Morph.init(async function () {
       try {
