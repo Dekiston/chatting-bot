@@ -17,19 +17,18 @@ function fileProcent(Id) {
   return "info" + Id + ".txt";
 } //название файла
 
-async function StatusFiles(Id) {
-  //создание файлов беседы
+async function StatusFiles(Id) {  //создание файлов беседы
   fs.stat(fileProcent(Id), function (err) {
     if (err) {
       fs.writeFileSync(fileProcent(Id), "procent: 100\nwords: 0");
-    }
+    }//процент
   });
   fs.stat(fileDict(Id), function (err) {
     if (err) {
       fs.writeFileSync(fileDict(Id), '{ "words": [] }');
     }
   }); //слова
-} //процент
+} 
 
 function Upperone(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
@@ -45,11 +44,10 @@ function fileChoice(Id, Gender, Number) {
   let index = object.length - 1;
   let num = 0;
   let OneWord = object[getRandom(index)];
-  while ((OneWord.GNdr != Gender || OneWord.NMbr != Number) && num < 10) {
+  while ((OneWord.GNdr != Gender || OneWord.NMbr != Number) && num < 5) {
     OneWord = object[getRandom(index)];
     num = num + 1;
   }
-  //console.log(OneWord);
   return OneWord.word;
 } //чтение коллекции
 
@@ -59,40 +57,41 @@ function procent(Id) {
   return procent[0].slice(8, 12);
 } //чтение процента из файла
 
-function speller (message) {
+function speller(message) {
   let newmessage = [];
   for (let word of message) {
-  let xhr = new XMLHttpRequest();
-  let url = new URL ("https://speller.yandex.net/services/spellservice.json/checkText?text=" + word);
-  xhr.open("GET", url, false);
-  xhr.send();
-  let answer =  JSON.parse(xhr.responseText);
-  if (!answer[0]) {newmessage.push (word)}
-  else {newmessage.push (answer[0].s[0])}
+    let xhr = new XMLHttpRequest();
+    let url = new URL("https://speller.yandex.net/services/spellservice.json/checkText?text=" + word);
+    xhr.open("GET", url, false);
+    xhr.send();
+    let answer = JSON.parse(xhr.responseText);
+    if (!answer[0]) { newmessage.push(word) }
+    else { newmessage.push(answer[0].s[0]) }
   }
-     newmessage.join(" ");
-     return newmessage;  
-}
+  newmessage.join(" ");
+  return newmessage;
+} //проверка орфографии 
 
 
 bot.hear(/^mhelp$/i, (context) => {
   context.send(
-    "minfo - вывод информации беседы\n" + "mp - изменения процента сообщений\n"
+    "minfo - вывод информации беседы\nmp - изменения процента сообщений\nmclear - сброс данных"
   );
 }); //легенда
 
 bot.hear(/^minfo$/i, (context) => {
-  //информация по беседе
   context.send(fs.readFileSync(fileProcent(context.chatId), "utf8"));
-});
+});  //информация по беседе
 
 bot.hear(/^mclear$/i, (context) => {
-  fs.unlink (fileProcent(context.chatId), (err) => {
-    if (err) { console.log('path/file.txt was deleted');}});
-  fs.unlink (fileDict(context.chatId), (err) => {
-    if (err) { console.log('path/file.txt was deleted');}});
+  fs.unlink(fileProcent(context.chatId), (err) => {
+    if (err) { console.log('path/file.txt was deleted'); }
+  });
+  fs.unlink(fileDict(context.chatId), (err) => {
+    if (err) { console.log('path/file.txt was deleted'); }
+  });
   context.send("Очищено.");
-});
+}); //удаление файлов беседы
 
 bot.hear(/^mp....|mp...$/i, (context) => {
   //изменение процента ответов
@@ -103,21 +102,21 @@ bot.hear(/^mp....|mp...$/i, (context) => {
   context.send("Процент изменен.");
 }); //изменение процента
 
-bot.hear(/./, async (context) => {
-  //любое сообщение
+bot.hear(/./, async (context) => {  //любое сообщение
+
   let Id = context.chatId; //Id чата
 
-  let message = context.text.split(" "); //деление сообщения на слова
-  
-  message = speller (message);
-  
-   for (let word of message) {
+  let message = speller(context.text.split(" "));
+
+  for (let word of message) {
     if (/[,.!?;:()]/.test(word[word.length - 1])) {
       word = word.slice(0, -1);
     } //проверка на знаки препинания в конце слова
+
     if (/[,.!?;:()]/.test(word)) {
       continue;
     } //пропуск одиночных знаков препинания
+
     word = Upperone(word.toLowerCase());
 
     Az.Morph.init(async function () {
@@ -132,6 +131,7 @@ bot.hear(/./, async (context) => {
         if (existingWord.length > 0) {
           return;
         }
+
         let property = {
           POST: part.POST,
           word: word, //слово
@@ -143,7 +143,7 @@ bot.hear(/./, async (context) => {
         object.words.push(property); //добавление данных - 2 -
         let json = JSON.stringify(object); //обратно в JSON
         fs.writeFileSync(fileDict(Id), json);
-      } catch {}
+      } catch { }
     });
   }
 
