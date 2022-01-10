@@ -1,8 +1,8 @@
-# Bot_VK
+# chatting-bot
 
 <a href="https://codeclimate.com/github/Dekiston/Bot_VK/maintainability"><img src="https://api.codeclimate.com/v1/badges/d88067db483d4be7b44a/maintainability" /></a>
 
-## Install
+## Установка
 
 ```sh
 clone repository
@@ -10,8 +10,18 @@ clone repository
 npm install
 ```
 
-## Run
+## Запуск
 
 ```sh
 npm start
+```
+
+## Как работает
+
+```sh
+1. создать сообщество в вк и включить в настройках Long Poll API
+2. замените в токен вк, на токен своего сообщества
+3. добавьте своё сообщество в беседу на правах администратора
+---------------------------
+Если вы все правильно сделали, то после включения бота, он начнет учиться на ваших сообщениях в беседе и отвечать на них.
 ```
