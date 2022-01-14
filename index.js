@@ -3,9 +3,9 @@ const { HearManager } = require("@vk-io/hear");
 const Az = require("az");
 const fs = require("fs");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+let tokenLongPollAPI = fs.readFileSync("token.txt"); //
 const vk = new VK({
-  token:
-    "937a07a228fdf17ec8049f4943b5ffa0168147655c4dbc9fefc13d0c55527a71e82c6b71c33d52c251195",
+  token: tokenLongPollAPI 
 });
 const bot = new HearManager();
 vk.updates.on("message", bot.middleware);
@@ -13,6 +13,7 @@ vk.updates.on("message", bot.middleware);
 function fileDict(Id) {
   return "dictionary" + Id + ".JSON";
 } //название файла
+
 function fileProcent(Id) {
   return "info" + Id + ".txt";
 } //название файла
@@ -23,6 +24,7 @@ async function StatusFiles(Id) {  //создание файлов беседы
       fs.writeFileSync(fileProcent(Id), "procent: 100\nwords: 0");
     }//процент
   });
+
   fs.stat(fileDict(Id), function (err) {
     if (err) {
       fs.writeFileSync(fileDict(Id), '{ "words": [] }');
@@ -70,12 +72,12 @@ function speller(message) {
   }
   newmessage.join(" ");
   return newmessage;
-} //проверка орфографии 
+} //проверка орфографии Я.Спеллер API
 
 
 bot.hear(/^mhelp$/i, (context) => {
   context.send(
-    "minfo - вывод информации беседы\nmp - изменения процента сообщений\nmclear - сброс данных"
+    "minfo - вывод информации беседы\nmp - изменения процента сообщений\nmclear - сброс данных беседы"
   );
 }); //легенда
 
@@ -187,21 +189,3 @@ bot.onFallback((context) => {
 
 console.log("Бот запущен!");
 vk.updates.start().catch(console.error);
-
-//NOUN	имя существительное	хомяк
-//ADJF	имя прилагательное (полное)	хороший
-//ADJS	имя прилагательное (краткое)	хорош
-//COMP	компаратив	лучше, получше, выше
-//VERB	глагол (личная форма)	говорю, говорит, говорил
-//INFN	глагол (инфинитив)	говорить, сказать
-//PRTF	причастие (полное)	прочитавший, прочитанная
-//PRTS	причастие (краткое)	прочитана
-//GRND	деепричастие	прочитав, рассказывая
-//NUMR	числительное	три, пятьдесят
-//ADVB	наречие	круто
-//NPRO	местоимение-существительное	он
-//PRED	предикатив	некогда
-//PREP	предлог	в
-//CONJ	союз	и
-//PRCL	частица	бы, же, лишь
-//INTJ  число
