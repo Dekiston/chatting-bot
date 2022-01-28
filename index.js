@@ -135,8 +135,8 @@ bot.hear(/./, async (context) => {  //любое сообщение
         }
 
         let property = {
-          POST: part.POST,
           word: word, //слово
+          POST: part.POST,          
           GNdr: part.GNdr, //род
           NMbr: part.NMbr, //ед. множ. число
           СAse: part.CAse, //падеж
@@ -155,14 +155,15 @@ bot.hear(/./, async (context) => {  //любое сообщение
     const Numbers = ["plur", "sing"];
 
     let message;
+    let lengthText;
 
     switch (getRandom(1)) {
       case 0:
-        console.log(0);
         message = fileChoice(Id, Genders[getRandom(3)], Numbers[getRandom(2)]);
-        for (let i = 0; i < getRandom(4) + 1; i++) {
-          message = message + " " + fileChoice(Id, Genders[getRandom(3)]);
-        }
+ 
+        lengthText = getRandom(5) + 1;
+
+        for (let i = 0; i < lengthText; i++) { message = message + " " + fileChoice(Id, Genders[getRandom(3)]); }
         message = Upperone(message.toLowerCase());
         context.send(message);
         break;
