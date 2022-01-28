@@ -3,7 +3,7 @@ const { HearManager } = require("@vk-io/hear");
 const Az = require("az");
 const fs = require("fs");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-let tokenLongPollAPI = fs.readFileSync("token.txt"); //
+const tokenLongPollAPI = fs.readFileSync("token.txt"); //экспорт токена беседы
 const vk = new VK({
   token: tokenLongPollAPI 
 });
@@ -22,9 +22,9 @@ const parseJSON = (arg) => {
   let obj = fs.readFileSync(arg);
   obj = JSON.parse(obj);
   return obj;
-}
+} //чтение json файлов с аргументом
 
-const StatusFiles = async (Id) => {  //создание файлов беседы
+const StatusFiles = async (Id) => {
   fs.stat(fileProcent(Id), (err) => {
     if (err) {
       fs.writeFileSync(fileProcent(Id), "procent: 100\nwords: 0");
@@ -36,7 +36,7 @@ const StatusFiles = async (Id) => {  //создание файлов бесед�
       fs.writeFileSync(fileDict(Id), '{ "words": [] }');
     }
   }); //слова
-} 
+} //создание файлов беседы
 
 const fileChoice = (Id, Gender, Number) => {
   let object = fs.readFileSync(fileDict(Id), "utf8");
@@ -57,18 +57,18 @@ const procent = (Id) => {
   return procent[0].slice(8, 12);
 } //чтение процента из файла
 
-const speller = (message, Id) => {
+const speller = async (message, Id) => {
    let newmessage = [];
    let xhr, url, answer;
   for (let word of message) {
-    let object = parseJSON (fileDict(Id)); //обьект  - 1 -
-    const existingWord = object.words.filter((obj) => obj.word === word); //проверка одинаковых слов
-    existingWord.length > 0 ? newmessage.push(word) : (
+    let object = parseJSON (fileDict(Id));                                //вызов обьекта со словами  - 1 -
+    const existingWord = object.words.filter((obj) => obj.word === word); //и проверка одинаковых слов
+    existingWord.length > 0 ? newmessage.push(word) : (                   //чтобы не делать лишний запрос 
     xhr = new XMLHttpRequest(),
     url = new URL("https://speller.yandex.net/services/spellservice.json/checkText?text=" + word),
     xhr.open("GET", url, false),
     xhr.send(),
-    answer = JSON.parse(xhr.responseText),
+    answer = await JSON.parse(xhr.responseText),
     !answer[0] ? newmessage.push(word) : newmessage.push(answer[0].s[0]) )
   }
   newmessage.join(" ");
@@ -107,10 +107,10 @@ bot.hear(/./, async (context) => {  //любое сообщение
   let time = performance.now();
   let Id = context.chatId; //Id чата
   
-  let message = speller(context.text.split(" "), Id);
+  let message = await speller(context.text.split(" "), Id); //авто-исправление слов через я.спеллер
 
   for (let word of message) {
-    if (/[,.!?;:()]/.test(word[word.length - 1])) {
+    if (/[,.!?;:()]| \s /.test(word[word.length - 1])) {
       word = word.slice(0, -1);
     } //проверка на знаки препинания в конце слова
 
@@ -119,9 +119,6 @@ bot.hear(/./, async (context) => {  //любое сообщение
     } //пропуск одиночных знаков препинания
 
     word = Upperone(word.toLowerCase());
-    //let time = performance.now();
-    //time = performance.now() - time;
-    //console.log ("Время выполнения: " + time);
     Az.Morph.init(async function () {
       try {
         let part = Az.Morph(word)[0].tag; //морфологический разбор слова
@@ -135,8 +132,8 @@ bot.hear(/./, async (context) => {  //любое сообщение
         }
 
         let property = {
+          POST: part.POST, //часть речи
           word: word, //слово
-          POST: part.POST,          
           GNdr: part.GNdr, //род
           NMbr: part.NMbr, //ед. множ. число
           СAse: part.CAse, //падеж
@@ -155,23 +152,22 @@ bot.hear(/./, async (context) => {  //любое сообщение
     const Numbers = ["plur", "sing"];
 
     let message;
-    let lengthText;
+    let lengthMsg = getRandom(10) + 1; //количество слов в сообщении
 
     switch (getRandom(1)) {
       case 0:
+        console.log(0);
         message = fileChoice(Id, Genders[getRandom(3)], Numbers[getRandom(2)]);
- 
-        lengthText = getRandom(5) + 1;
-
-        for (let i = 0; i < lengthText; i++) { message = message + " " + fileChoice(Id, Genders[getRandom(3)]); }
+        for (let i = 0; i < lengthMsg; i++) {
+          message = message + " " + fileChoice(Id, Genders[getRandom(3)]);
+        }
         message = Upperone(message.toLowerCase());
         context.send(message);
         break;
     }
   }
-  
     time = performance.now() - time;
-    console.log ("Время выполнения: " + time);
+    console.log ("Время выполнения: " + time.toFixed(3));
 });
 
 bot.onFallback((context) => {
