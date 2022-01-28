@@ -1,7 +1,7 @@
 {
-  "name": "bot_vk",
+  "name": "chatting-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "<a href=\"https://codeclimate.com/github/Dekiston/Bot_VK/maintainability\"><img src=\"https://api.codeclimate.com/v1/badges/d88067db483d4be7b44a/maintainability\" /></a>",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
@@ -25,5 +25,6 @@
     "synaptic": "^1.1.4",
     "vk-io": "^4.4.0",
     "xmlhttprequest": "^1.8.0"
-  }
+  },
+  "devDependencies": {}
 }

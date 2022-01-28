@@ -2,5 +2,7 @@
 dictionary*.json
 info*.txt
 index.js
-
+token.txt
 .DS_Store
+bunker.json
+token.txt

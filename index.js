@@ -10,37 +10,35 @@ const vk = new VK({
 const bot = new HearManager();
 vk.updates.on("message", bot.middleware);
 
-function fileDict(Id) {
-  return "dictionary" + Id + ".JSON";
-} //название файла
+const fileDict = (Id) =>  "dictionary" + Id + ".JSON"; //название файла
 
-function fileProcent(Id) {
-  return "info" + Id + ".txt";
-} //название файла
+const fileProcent = (Id) => "info" + Id + ".txt"; //название файла
 
-async function StatusFiles(Id) {  //создание файлов беседы
-  fs.stat(fileProcent(Id), function (err) {
+const Upperone = (text) => text.charAt(0).toUpperCase() + text.slice(1); //Изменение регистра первой буквы^
+
+const getRandom = (max) => Math.floor(Math.random() * max); //случайное число
+
+const parseJSON = (arg) => {
+  let obj = fs.readFileSync(arg);
+  obj = JSON.parse(obj);
+  return obj;
+}
+
+const StatusFiles = async (Id) => {  //создание файлов беседы
+  fs.stat(fileProcent(Id), (err) => {
     if (err) {
       fs.writeFileSync(fileProcent(Id), "procent: 100\nwords: 0");
     }//процент
   });
 
-  fs.stat(fileDict(Id), function (err) {
+  fs.stat(fileDict(Id), (err) => {
     if (err) {
       fs.writeFileSync(fileDict(Id), '{ "words": [] }');
     }
   }); //слова
 } 
 
-function Upperone(text) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-} //Изменение регистра первой буквы^
-
-function getRandom(max) {
-  return Math.floor(Math.random() * max);
-} //случайное число
-
-function fileChoice(Id, Gender, Number) {
+const fileChoice = (Id, Gender, Number) => {
   let object = fs.readFileSync(fileDict(Id), "utf8");
   object = JSON.parse(object).words;
   let index = object.length - 1;
@@ -53,22 +51,25 @@ function fileChoice(Id, Gender, Number) {
   return OneWord.word;
 } //чтение коллекции
 
-function procent(Id) {
+const procent = (Id) => {
   let procent = [];
   procent.push(fs.readFileSync(fileProcent(Id), "utf8"));
   return procent[0].slice(8, 12);
 } //чтение процента из файла
 
-function speller(message) {
-  let newmessage = [];
+const speller = (message, Id) => {
+   let newmessage = [];
+   let xhr, url, answer;
   for (let word of message) {
-    let xhr = new XMLHttpRequest();
-    let url = new URL("https://speller.yandex.net/services/spellservice.json/checkText?text=" + word);
-    xhr.open("GET", url, false);
-    xhr.send();
-    let answer = JSON.parse(xhr.responseText);
-    if (!answer[0]) { newmessage.push(word) }
-    else { newmessage.push(answer[0].s[0]) }
+    let object = parseJSON (fileDict(Id)); //обьект  - 1 -
+    const existingWord = object.words.filter((obj) => obj.word === word); //проверка одинаковых слов
+    existingWord.length > 0 ? newmessage.push(word) : (
+    xhr = new XMLHttpRequest(),
+    url = new URL("https://speller.yandex.net/services/spellservice.json/checkText?text=" + word),
+    xhr.open("GET", url, false),
+    xhr.send(),
+    answer = JSON.parse(xhr.responseText),
+    !answer[0] ? newmessage.push(word) : newmessage.push(answer[0].s[0]) )
   }
   newmessage.join(" ");
   return newmessage;
@@ -76,9 +77,7 @@ function speller(message) {
 
 
 bot.hear(/^mhelp$/i, (context) => {
-  context.send(
-    "minfo - вывод информации беседы\nmp - изменения процента сообщений\nmclear - сброс данных беседы"
-  );
+  context.send("minfo - вывод информации беседы\nmp - изменения процента сообщений\nmclear - сброс данных беседы");
 }); //легенда
 
 bot.hear(/^minfo$/i, (context) => {
@@ -105,10 +104,10 @@ bot.hear(/^mp....|mp...$/i, (context) => {
 }); //изменение процента
 
 bot.hear(/./, async (context) => {  //любое сообщение
-
+  let time = performance.now();
   let Id = context.chatId; //Id чата
-
-  let message = speller(context.text.split(" "));
+  
+  let message = speller(context.text.split(" "), Id);
 
   for (let word of message) {
     if (/[,.!?;:()]/.test(word[word.length - 1])) {
@@ -120,14 +119,15 @@ bot.hear(/./, async (context) => {  //любое сообщение
     } //пропуск одиночных знаков препинания
 
     word = Upperone(word.toLowerCase());
-
+    //let time = performance.now();
+    //time = performance.now() - time;
+    //console.log ("Время выполнения: " + time);
     Az.Morph.init(async function () {
       try {
         let part = Az.Morph(word)[0].tag; //морфологический разбор слова
         await StatusFiles(Id); //проверка на существование файлов беседы
 
-        let object = fs.readFileSync(fileDict(Id));
-        object = JSON.parse(object); //обьект  - 1 -
+        let object = parseJSON (fileDict(Id)); //обьект  - 1 -
 
         const existingWord = object.words.filter((obj) => obj.word === word); //проверка одинаковых слов
         if (existingWord.length > 0) {
@@ -147,6 +147,7 @@ bot.hear(/./, async (context) => {  //любое сообщение
         fs.writeFileSync(fileDict(Id), json);
       } catch { }
     });
+    
   }
 
   if (procent(Id) > getRandom(100)) {
@@ -167,10 +168,13 @@ bot.hear(/./, async (context) => {  //любое сообщение
         break;
     }
   }
+  
+    time = performance.now() - time;
+    console.log ("Время выполнения: " + time);
 });
 
 bot.onFallback((context) => {
-  switch (getRandom(5)) {
+  switch (getRandom(3)) {
     case 0:
       console.log("2.0");
       context.send("АХАХАХАХА");
