@@ -1,5 +1,5 @@
-const { tokenize, textify } = require ("./parser.js");
-const {range, pickRandom, getRandom, upperone, fileDict, fileProcent} = require ("./tools.js");
+const { tokenize, textify } = require ("../noun/parser.js");
+const {range, pickRandom, getRandom, upperone, fileDict, fileProcent} = require ("../noun/tools.js");
 
 
 const escapeString = (token) => `_+${token}`;
@@ -53,8 +53,8 @@ function* generateChain(startText, transitions, sampleSize) {
 function generate({
   source,
   start = null,
-  wordsCount = 200,
-  sampleSize = 3,
+  wordsCount,
+  sampleSize,
 } = {}) {
   if (!source) throw new Error("Исходный текст пустой");
   if (sampleSize < 2) throw new Error("Размер должен быть не менее 2");

@@ -22,7 +22,7 @@ function exists(entity) {
 
 function tokenize(text) {
   return text
-    .replaceAll(newlinesRegex, newLinePlaceHolder)
+    .replace(newlinesRegex, newLinePlaceHolder)
     .split(tokenizeRegex)
     .filter(exists);
 }
@@ -31,7 +31,7 @@ function textify(tokens) {
   return tokens
     .filter(exists)
     .join("")
-    .replaceAll(newLinePlaceHolder, paragraph);
+    .replace(newLinePlaceHolder, paragraph);
 }
 
 exports.tokenize = tokenize;
