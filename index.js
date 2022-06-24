@@ -1,5 +1,5 @@
 const { VK } = require("vk-io");
-const { HearManager } = require("@vk-io/hear");
+const { HearManager } = require("vk-io/hear");
 const Az = require("az");
 const fs = require("fs");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -103,7 +103,7 @@ bot.hear(/^mp....|mp...$/i, (context) => {
   context.send("Процент изменен.");
 }); //изменение процента
 
-bot.hear (/^тест/i, async (context) => {
+bot.hear (/^Лс/i, async (context) => {
 let [userData] = await vk.api.users.get({user_id: context.senderId}); //получение информации со странички получателя
 let response = {
   peer_id: context.senderId, //id получателя (отправка в личные сообщения)
@@ -157,7 +157,7 @@ bot.hear(/./, async (context) => {
 
     let gender = genders[getRandom(3)];
     let message;
-    let lengthMsg = getRandom(5) + 1; //количество слов в сообщении
+    let lengthMsg = getRandom(10) + 2; //количество слов в сообщении
 
     switch (getRandom(1)) {
       case 0:
@@ -166,6 +166,7 @@ bot.hear(/./, async (context) => {
           message = message + " " + fileChoice(Id);
         }
         message = Upperone(message.toLowerCase());
+        console.log('hello');
         context.send(message);
         break;
     }
@@ -190,5 +191,4 @@ bot.onFallback((context) => {
   }
 }); // Обработчик, если команда не существует
 
-console.log("Бот запущен!");
 vk.updates.start().catch(console.error);
