@@ -11,9 +11,16 @@
 
  const fileProcent = (Id) => {return ("info" + Id + ".txt");} //название файла
 
+ const sourcePath = (Id) => {return "cli/" + "dictionary" + Id + ".txt";} //путь к словарю
+
+ const procentPath = (Id) => {return "cli/" + "info" + Id + ".txt";} //путь к настройкам
+
  exports.getRandom = getRandom;
  exports.upperone = upperone;
  exports.pickRandom = pickRandom;
  exports.range = range;
  exports.fileDict = fileDict;
  exports.fileProcent = fileProcent;
+ exports.sourcePath = sourcePath;
+ exports.procentPath = procentPath;
+

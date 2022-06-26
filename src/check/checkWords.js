@@ -20,16 +20,12 @@ const checkWords = async (Id, message) => {
     if (/[,.!?;:()-+='"]$/.test(messageCorrect)) {messageCorrect += ' ';}
     else {messageCorrect += '. ';}
 
-    console.log (messageCorrect);
-
     let object = 'cli/' + fileDict(Id);
 
     fs.appendFile(object, messageCorrect, function (err) {
         if (err) throw err;
         console.log('Сохранено!');
       });
-
-
 }
 
 exports.checkWords = checkWords;

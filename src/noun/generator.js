@@ -50,12 +50,8 @@ function* generateChain(startText, transitions, sampleSize) {
   }
 }
 
-function sourcePath (Id) {
-return fs.readFileSync("cli/example.txt");
-}
-
 function generate({
-  source = sourcePath(),
+  source,
   start = null,
   wordsCount,
   sampleSize,
@@ -69,6 +65,7 @@ function generate({
 
   const generator = generateChain(start, transitions, sampleSize);
   const chain = range(wordsCount).map((_) => generator.next().value);
+
   return textify(chain);
 }
 
