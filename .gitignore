@@ -1,8 +1,9 @@
 /node_modules/
-dictionary*.json
+dictionary*.txt
 info*.txt
 index.js
 token.txt
 .DS_Store
 bunker.json
 token.txt
+example.txt

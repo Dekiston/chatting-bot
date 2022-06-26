@@ -7,9 +7,9 @@
 
  const range = (count) => Array.from(Array(count).keys());
 
- const fileDict = (Id) => "dictionary" + Id + ".txt"; //название файла
+ const fileDict = (Id) => {return ("dictionary" + Id + ".txt");} //название файла
 
- const fileProcent = (Id) => "info" + Id + ".txt"; //название файла
+ const fileProcent = (Id) => {return ("info" + Id + ".txt");} //название файла
 
  exports.getRandom = getRandom;
  exports.upperone = upperone;

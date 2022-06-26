@@ -1,6 +1,6 @@
 const { tokenize, textify } = require ("../noun/parser.js");
 const {range, pickRandom, getRandom, upperone, fileDict, fileProcent} = require ("../noun/tools.js");
-
+const fs = require ("fs");
 
 const escapeString = (token) => `_+${token}`;
 const fromTokens = (tokens) => escapeString(tokens.join(""));
@@ -50,8 +50,12 @@ function* generateChain(startText, transitions, sampleSize) {
   }
 }
 
+function sourcePath (Id) {
+return fs.readFileSync("cli/example.txt");
+}
+
 function generate({
-  source,
+  source = sourcePath(),
   start = null,
   wordsCount,
   sampleSize,

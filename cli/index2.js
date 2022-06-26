@@ -1,42 +1,31 @@
-const path = require ("path");
+
 const fs = require ("fs");
 const {generate} = require ("../src/noun/generator.js");
-const {getRandom, fileDict, fileProcent} = require ("../src/noun/tools.js");
+const {getRandom} = require ("../src/noun/tools.js");
 const {VK} = require("vk-io");
+const {checkFiles} = require ('../src/check/checkFiles');
+const {checkWords} = require ('../src/check/checkWords');
 const {HearManager} = require("@vk-io/hear");
-const Az = require("az");
-const { constants } = require("buffer");
-const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-const tokenLongPollAPI = fs.readFileSync("./token.txt"); //экспорт токена беседы
+const tokenLongPollAPI = fs.readFileSync("cli/token.txt"); //экспорт токена беседы
 const vk = new VK({
   token: tokenLongPollAPI,
 });
 const bot = new HearManager();
 vk.updates.on("message", bot.middleware);
 
-const source = fs.readFileSync("cli/example.txt");
-
-const StatusFiles = async (Id) => {
-  fs.stat(fileProcent(Id), (err) => {
-    if (err) { fs.writeFileSync(fileProcent(Id), "procent: 100"); } //процент
-  });
-
-  fs.stat(fileDict(Id), (err) => {
-    if (err) { fs.writeFileSync(fileDict(Id), ""); } //слова
-  }); 
-}; //создание файлов беседы
 
 
 bot.hear(/./, async (context) => {
   console.log('сообщение ' + context.text);
+  let Id = context.chatId; //Id чата
 
-  //checkPoint (context.Id); //должно проверять наличие файлов беседы и создавать их
-  //saveWords (context.Id, context.text); //должно добавлять слова
+  checkFiles (Id); //должно проверять наличие файлов беседы и создавать их
+
+  checkWords (Id, context.text.split(" ")); //должно добавлять слова
 
   let answer = generate({
   wordsCount: getRandom (1, 30),
-  sampleSize: 4,
-  source });
+  sampleSize: 4,});
 
   context.send (answer);
 });
