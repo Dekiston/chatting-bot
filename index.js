@@ -8,15 +8,6 @@ bot.hear(/^minfo$/i, (context) => {
   context.send(fs.readFileSync(fileProcent(context.chatId), "utf8"));
 }); //информация по беседе
 
-bot.hear(/^mclear$/i, (context) => {
-  fs.unlink(fileProcent(context.chatId), (err) => {
-    if (err) {console.log("path/file.txt was deleted")}
-  });
-  fs.unlink(fileDict(context.chatId), (err) => {
-    if (err) {console.log("path/file.txt was deleted")}
-  });
-  context.send("Очищено.");
-}); //удаление файлов беседы
 
 bot.hear(/^mp....|mp...$/i, (context) => {
   //изменение процента ответов

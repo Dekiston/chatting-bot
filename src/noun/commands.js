@@ -1,7 +1,7 @@
 const {checkFiles} = require ('../check/checkFiles');
 const {checkWords} = require ('../check/checkWords');
 const fs = require ("fs");
-const {vk} = require("../src/noun/relations");
+const {vk} = require("./token.js");
 const {generate} = require ("./generator.js");
 const {getRandom, sourcePath, procentPath, upperone} = require ("./tools");
 
@@ -10,7 +10,10 @@ const {getRandom, sourcePath, procentPath, upperone} = require ("./tools");
 
 const help = (context) => {context.send("INFO - вывод информации беседы\nCENT - изменить процент ответов\nSIZE - изменить размер связей\nCOUNT - изменить длину сообщения\nCLEAR - сброс данных беседы");} //легенда)
 
-const info = (context) => {}
+const info = (context) => { 
+    let answer = fs.readFileSync(procentPath(context.chatId), 'utf8');
+    context.send(answer);
+}
 
 const cent = (context) => {}
 
