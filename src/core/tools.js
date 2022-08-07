@@ -9,11 +9,13 @@
 
  const fileDict = (Id) => {return ("dictionary" + Id + ".txt");} //название файла
 
- const fileProcent = (Id) => {return ("info" + Id + ".txt");} //название файла
+ const fileProcent = (Id) => {return ("info" + Id + ".json");} //название файла
 
  const sourcePath = (Id) => {return "cli/" + "dictionary" + Id + ".txt";} //путь к словарю
 
- const procentPath = (Id) => {return "cli/" + "info" + Id + ".txt";} //путь к настройкам
+ const procentPath = (Id) => {return "cli/" + "info" + Id + ".json";} //путь к настройкам
+
+ const valueParser = (text) => {return text.slice (5);} //получение нового значения из команды
 
  exports.getRandom = getRandom;
  exports.upperone = upperone;
@@ -23,4 +25,5 @@
  exports.fileProcent = fileProcent;
  exports.sourcePath = sourcePath;
  exports.procentPath = procentPath;
+ exports.valueParser = valueParser;
 

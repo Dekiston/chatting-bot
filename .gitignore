@@ -1,9 +1,9 @@
 /node_modules/
 dictionary*.txt
-info*.txt
-index.js
+info*.json
 token.txt
 .DS_Store
 bunker.json
 relations.js
 example.txt
+tasklog.txt

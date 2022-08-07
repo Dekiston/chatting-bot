@@ -1,5 +1,5 @@
-const { tokenize, textify } = require ("../noun/parser.js");
-const {range, pickRandom, getRandom, upperone, fileDict, fileProcent} = require ("../noun/tools.js");
+const { tokenize, accuracy } = require ("./parser.js");
+const {range, pickRandom, getRandom, upperone, fileDict, fileProcent} = require ("./tools.js");
 const fs = require ("fs");
 
 const escapeString = (token) => `_+${token}`;
@@ -66,7 +66,7 @@ function generate({
   const generator = generateChain(start, transitions, sampleSize);
   const chain = range(wordsCount).map((_) => generator.next().value);
 
-  return textify(chain);
+  return  accuracy(chain);
 }
 
 exports.generate = generate;

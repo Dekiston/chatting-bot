@@ -1,5 +1,5 @@
 
-const {getRandom, upperone, fileDict, fileProcent} = require ("../noun/tools.js");
+const {getRandom, upperone, fileDict, fileProcent} = require ("../core/tools.js");
 const fs = require ("fs");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
@@ -14,17 +14,17 @@ const checkWords = async (Id, message) => {
         xhr.send(),                                                                                     //Я.Спеллер API
         answer = await JSON.parse(xhr.responseText),                                                    //
         !answer[0] ? messageCorrect.push(word) : messageCorrect.push(answer[0].s[0]);                   //
-        }
+        } // проверка слов на орфаграфию с помощью Я.Спеллер
+
     messageCorrect = String (messageCorrect.join(" "));
     
     if (/[,.!?;:()-+='"]$/.test(messageCorrect)) {messageCorrect += ' ';}
-    else {messageCorrect += '. ';}
+    else {messageCorrect += ' ';}
 
     let object = 'cli/' + fileDict(Id);
 
     fs.appendFile(object, messageCorrect, function (err) {
         if (err) throw err;
-        console.log('Сохранено!');
       });
 }
 

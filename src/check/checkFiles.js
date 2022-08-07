@@ -1,10 +1,10 @@
 
-const {fileDict, fileProcent} = require ("../noun/tools.js");
+const {fileDict, fileProcent} = require ("../core/tools.js");
 const fs = require ("fs");
 
 const checkFiles = async (Id) => {
     fs.stat('cli/' + fileProcent(Id), (err) => {
-      if (err) { fs.writeFileSync( 'cli/' + fileProcent(Id), 'Процент: 100\nСлов: 30\nСвязь: 4'); } //процент
+      if (err) { fs.writeFileSync( 'cli/' + fileProcent(Id), '{"procent":100,"verbs":30,"link":4}'); } //процент
     });
   
     fs.stat('cli/' + fileDict(Id), (err) => {
