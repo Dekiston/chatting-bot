@@ -1,6 +1,6 @@
-const { tokenize, accuracy } = require ("./parser.js");
-const {range, pickRandom, getRandom, upperone, fileDict, fileProcent} = require ("./tools.js");
-const fs = require ("fs");
+const { tokenize, accuracy } = require("./parser.js");
+const { range, pickRandom } = require("./tools.js");
+const fs = require("fs");
 
 const escapeString = (token) => `_+${token}`;
 const fromTokens = (tokens) => escapeString(tokens.join(""));
@@ -26,7 +26,6 @@ function collectTransitions(samples) {
   }, {});
 }
 
-
 function createChain(startText, transitions) {
   const head = startText ?? pickRandom(Object.keys(transitions));
   return tokenize(head);
@@ -50,12 +49,7 @@ function* generateChain(startText, transitions, sampleSize) {
   }
 }
 
-function generate({
-  source,
-  start = null,
-  wordsCount,
-  sampleSize,
-} = {}) {
+function generate({ source, start = null, wordsCount, sampleSize } = {}) {
   if (!source) throw new Error("Исходный текст пустой");
   if (sampleSize < 2) throw new Error("Размер должен быть не менее 2");
 
@@ -66,7 +60,7 @@ function generate({
   const generator = generateChain(start, transitions, sampleSize);
   const chain = range(wordsCount).map((_) => generator.next().value);
 
-  return  accuracy(chain);
+  return accuracy(chain) + ".";
 }
 
 exports.generate = generate;
