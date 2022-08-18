@@ -1,7 +1,6 @@
 # chatting-bot
 
 <a href="https://codeclimate.com/github/Dekiston/Bot_VK/maintainability"><img src="https://api.codeclimate.com/v1/badges/d88067db483d4be7b44a/maintainability" /></a>
-<img src="/codecov/c/:vcsName/:user/:repo/:branch?flag=flag_name&token=a1b2c3d4e5" /></a>
 ## Установка и запуск
 
 ```sh
