@@ -71,15 +71,17 @@ const clear = (context) => {
 
 const anything = (context) => {
   let Id = context.chatId; //Id чата
-  let procent = jsonParse(context.chatId).procent;
 
   checkFiles(Id); //должно проверять наличие файлов беседы и создавать их
-
   checkWords(Id, context.text.split(" ")); //должно добавлять слова
 
+  let procent = jsonParse(context.chatId).procent;
+  let verbs = jsonParse(context.chatId).verbs; //получаем значения по которым будем строить предложение
+  let link = jsonParse(context.chatId).link; //учитывая настройки каждой бееды в json файле
+
   let answer = generate({
-    wordsCount: getRandom(2, 30),
-    sampleSize: 3,
+    wordsCount: getRandom(2, verbs),
+    sampleSize: link,
     source: fs.readFileSync(sourcePath(Id)),
   });
 

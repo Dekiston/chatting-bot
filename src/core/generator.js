@@ -1,5 +1,5 @@
 const { tokenize, accuracy } = require("./parser.js");
-const { range, pickRandom } = require("./tools.js");
+const { range, pickRandom, upperone } = require("./tools.js");
 const fs = require("fs");
 
 const escapeString = (token) => `_+${token}`;
@@ -60,7 +60,7 @@ function generate({ source, start = null, wordsCount, sampleSize } = {}) {
   const generator = generateChain(start, transitions, sampleSize);
   const chain = range(wordsCount).map((_) => generator.next().value);
 
-  return accuracy(chain) + ".";
+  return upperone(accuracy(chain).trimEnd() + ".");
 }
 
 exports.generate = generate;
