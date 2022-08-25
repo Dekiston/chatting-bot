@@ -23,16 +23,17 @@ const help = (context) => {
 }; //легенда)
 
 const variables = (context, value) => {
-  let json = jsonParse(context.chatId);
-  let newValue = Number(valueParser(context.text));
+  //одна функция на все изменения настроек беседы, вызывается несколькими командами
+  let json = jsonParse(context.chatId); //получение данных из json файла беседы
+  let newValue = Number(valueParser(context.text)); //получение нового значения из команды
 
   switch (
     value //выбор действий в зависимости от команды
   ) {
     case 0:
       context.send(
-        "Процент ответов: " +
-          json.procent +
+        "Процент ответов: " + //функция работает с помощью ключа который передается с вызовом команды в index.js
+          json.procent + //при выделении числа из команды идет сравнение с кейсом switch
           "\nМаксимум слов: " +
           json.verbs +
           "\nДлина связи: " +
@@ -61,10 +62,12 @@ const variables = (context, value) => {
 
 const clear = (context) => {
   fs.unlink(sourcePath(context.chatId), (err) => {
+    //удаление файла со словами
     if (err) throw err;
   });
 
   fs.unlink(procentPath(context.chatId), (err) => {
+    //удаление файла с настройками беседы
     if (err) throw err;
   });
 };
@@ -80,28 +83,32 @@ const anything = (context) => {
   let link = jsonParse(context.chatId).link; //учитывая настройки каждой бееды в json файле
 
   let answer = generate({
+    //создание ответа с учетом настроек каждой беседы
     wordsCount: getRandom(2, verbs),
     sampleSize: link,
     source: fs.readFileSync(sourcePath(Id)),
   });
 
   if (getRandom(1, 99) < procent) {
-    context.send(upperone(answer));
+    //отправка ответа происходит только если процент ответов больше рандомного числа
+    context.send(upperone(answer)); //ненастоящие проценты, но работает достаточно точно
   }
 };
 
 const personal = async (context) => {
+  //отправка сообщения в личные сообщения
   let [userData] = await vk.api.users.get({ user_id: context.senderId }); //получение информации со странички получателя
   let response = {
-    peer_id: context.senderId, //id получателя (отправка в личные сообщения)
-    message: "Привет " + userData.first_name,
+    peer_id: context.senderId, //id получателя
+    message: "Привет " + userData.first_name, //содержание сообщения
   }; //отправка одного из ключей
   try {
     await context.send(response);
-  } catch {}
+  } catch {} //если вдруг отправка сообщений запрещена
 };
 
 const emptiness = (context) => {
+  //отправка сообщения если пользователь прислал не текст (фото видео аудио)
   switch (getRandom(0, 5)) {
     case 0:
       context.send("АХАХАХАХА");
@@ -109,8 +116,9 @@ const emptiness = (context) => {
 
     case 1:
       vk.api.messages.send({
+        //вызов стикера вк
         peer_id: context.peerId,
-        sticker_id: 163,
+        sticker_id: 163, //id стикера можно найти в документации вк
         random_id: 0,
       });
       break;

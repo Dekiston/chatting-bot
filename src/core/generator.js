@@ -1,6 +1,7 @@
 const { tokenize, accuracy } = require("./parser.js");
-const { range, pickRandom, upperone } = require("./tools.js");
+const { range, pickRandom, upperone, getRandom } = require("./tools.js");
 const fs = require("fs");
+const { anything } = require("./commands.js");
 
 const escapeString = (token) => `_+${token}`;
 const fromTokens = (tokens) => escapeString(tokens.join(""));
@@ -50,7 +51,6 @@ function* generateChain(startText, transitions, sampleSize) {
 }
 
 function generate({ source, start = null, wordsCount, sampleSize } = {}) {
-  if (!source) throw new Error("Исходный текст пустой");
   if (sampleSize < 2) throw new Error("Размер должен быть не менее 2");
 
   const corpus = tokenize(String(source));
@@ -60,7 +60,20 @@ function generate({ source, start = null, wordsCount, sampleSize } = {}) {
   const generator = generateChain(start, transitions, sampleSize);
   const chain = range(wordsCount).map((_) => generator.next().value);
 
-  return upperone(accuracy(chain).trimEnd() + ".");
+  let answer = upperone(accuracy(chain).trimEnd());
+
+  console.log(answer);
+
+  if (answer.length - answer.lastIndexOf(" ") - 1 < 4) {
+    let endWord;
+    do {
+      endWord = corpus[getRandom(0, corpus.length - 1)];
+    } while (endWord.length < 4);
+    answer = answer + " " + endWord;
+  }
+
+  answer = answer.trimEnd() + ".";
+  return answer;
 }
 
 exports.generate = generate;
