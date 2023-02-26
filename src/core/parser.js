@@ -1,7 +1,7 @@
 
 const newLinePlaceHolder = "§";
 
-const firstSymbol = /[^\d\sА-Я]/gi //если вдруг предложение начинается со знака
+const firstSymbol = /[^\d\sА-ЯЁA-Z]/gi //если вдруг предложение начинается со знака
 
 const paragraph = "\n\n";
 
@@ -31,11 +31,16 @@ function tokenize(text) {
 }
 
 function accuracy(tokens) {
-  return tokens
+  tokens = tokens
     .filter(exists)
     .join("")
-    .replace(newLinePlaceHolder, paragraph)
+    .replace(newLinePlaceHolder, paragraph);
+    console.log ("1: " + tokens);
+    tokens = tokens
     .replace(firstSymbol, "");
+    console.log ("2: " + tokens);
+
+    return tokens
 }
 
 exports.tokenize = tokenize;

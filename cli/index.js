@@ -15,7 +15,7 @@ bot.hear(/^HELP$/i, (context) => {
   help(context);
 }); //список команд
 
-bot.hear(/^INFO$/i, (cont1ext) => {
+bot.hear(/^INFO$/i, (context) => {
   variables(context, 0);
 }); //настройки беседы
 

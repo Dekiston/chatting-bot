@@ -3,3 +3,4 @@ dictionary*.txt
 info*.json
 .DS_Store
 tasklog.txt
+.node*

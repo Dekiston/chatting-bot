@@ -61,7 +61,7 @@ function generate({ source, start = null, wordsCount, sampleSize } = {}) {
 
   let answer = upperone(accuracy(chain).trimEnd());
 
-  console.log(answer);
+  console.log("3: " + answer);
 
   if (answer.length - answer.lastIndexOf(" ") - 1 < 4) {
     let endWord;
@@ -70,7 +70,7 @@ function generate({ source, start = null, wordsCount, sampleSize } = {}) {
     } while (endWord.length < 4);
     answer = answer + " " + endWord;
   }
-
+  console.log("final: " + answer + "\n");
   answer = answer.trimEnd() + ".";
   return answer;
 }
