@@ -9,7 +9,7 @@ const range = (count) => Array.from(Array(count).keys());
 
 const fileDict = (Id) => {
   return "dictionary" + Id + ".txt";
-}; //название файла
+}; //название словаря
 
 const fileProcent = (Id) => {
   return "info" + Id + ".json";

@@ -1,7 +1,6 @@
 const { tokenize, accuracy } = require("./parser.js");
 const { range, pickRandom, upperone, getRandom } = require("./tools.js");
 const fs = require("fs");
-const { anything } = require("./commands.js");
 
 const escapeString = (token) => `_+${token}`;
 const fromTokens = (tokens) => escapeString(tokens.join(""));

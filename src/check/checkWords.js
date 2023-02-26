@@ -1,4 +1,5 @@
 const { fileDict } = require("../core/tools.js");
+const { paragraph } = require("../core/parser.js");
 const fs = require("fs");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
@@ -21,7 +22,8 @@ const checkWords = async (Id, message) => {
         : messageCorrect.push(answer[0].s[0]); //
   } // проверка слов на орфаграфию с помощью Я.Спеллер
 
-  messageCorrect = String(messageCorrect.join(" ")) + " ".toLowerCase();
+  (messageCorrect = String(messageCorrect.join(" ") + " ").toLowerCase()),
+    messageCorrect.replace(paragraph, " ");
 
   let object = "cli/" + fileDict(Id);
 
