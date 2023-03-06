@@ -2,6 +2,7 @@ const { checkFiles } = require("../check/checkFiles");
 const { checkWords } = require("../check/checkWords");
 const fs = require("fs");
 const { vk } = require("./token.js");
+
 const { generate } = require("./generator.js");
 const {
   getRandom,
@@ -60,7 +61,7 @@ const variables = (context, value) => {
   fs.writeFile(procentPath(context.chatId), JSON.stringify(json), (err) => {}); //обратная запись
 };
 
-const clear = (context) => {
+  const clear = async (context) =>  {
   fs.unlink(sourcePath(context.chatId), (err) => {
     //удаление файла со словами
     if (err) throw err;
@@ -72,7 +73,7 @@ const clear = (context) => {
   });
 };
 
-const anything = (context) => {
+  const anything = async (context) =>  {
   let Id = context.chatId; //Id чата
 
   checkFiles(Id); //должно проверять наличие файлов беседы и создавать их
@@ -82,7 +83,7 @@ const anything = (context) => {
   let verbs = jsonParse(context.chatId).verbs; //получаем значения по которым будем строить предложение
   let link = jsonParse(context.chatId).link; //учитывая настройки каждой бееды в json файле
 
-  let answer = generate({
+  let answer = await generate({
     //создание ответа с учетом настроек каждой беседы
     wordsCount: getRandom(2, verbs),
     sampleSize: link,

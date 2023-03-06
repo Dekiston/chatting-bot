@@ -1,7 +1,7 @@
 const { tokenize, accuracy } = require("./parser.js");
 const { range, pickRandom, upperone, getRandom } = require("./tools.js");
 const fs = require("fs");
-
+const translate = require('translate-google');
 const escapeString = (token) => `_+${token}`;
 const fromTokens = (tokens) => escapeString(tokens.join(""));
 
@@ -49,7 +49,7 @@ function* generateChain(startText, transitions, sampleSize) {
   }
 }
 
-function generate({ source, start = null, wordsCount, sampleSize } = {}) {
+ async function generate({ source, start = null, wordsCount, sampleSize } = {}) {
   if (sampleSize < 2) throw new Error("Размер должен быть не менее 2");
 
   const corpus = tokenize(String(source));
@@ -70,9 +70,18 @@ function generate({ source, start = null, wordsCount, sampleSize } = {}) {
     } while (endWord.length < 4);
     answer = answer + " " + endWord;
   }
+
   console.log("final: " + answer + "\n");
-  answer = answer.trimEnd() + ".";
-  return answer;
+
+  let reverse;
+
+  await translate(answer, {to: 'en'}).then( resEn => { reverse = resEn });
+  await translate(reverse, {to: 'ru'}).then( resRu => { reverse = resRu });
+  console.log ("reverse: " + reverse);
+
+   answer = reverse.trimEnd() + ".";
+
+  return await answer;
 }
 
 exports.generate = generate;

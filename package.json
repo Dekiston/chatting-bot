@@ -23,8 +23,8 @@
     "az": "^0.2.3",
     "node-vk-bot-api": "^3.5.0",
     "synaptic": "^1.1.4",
+    "translate-google": "^1.5.0",
     "vk-io": "^4.4.0",
     "xmlhttprequest": "^1.8.0"
-  },
-  "devDependencies": {}
+  }
 }
