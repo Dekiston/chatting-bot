@@ -73,7 +73,7 @@ const variables = (context, value) => {
   });
 };
 
-  const anything = async (context) =>  {
+  const anything = (context) =>  {
   let Id = context.chatId; //Id чата
 
   checkFiles(Id); //должно проверять наличие файлов беседы и создавать их
@@ -83,12 +83,14 @@ const variables = (context, value) => {
   let verbs = jsonParse(context.chatId).verbs; //получаем значения по которым будем строить предложение
   let link = jsonParse(context.chatId).link; //учитывая настройки каждой бееды в json файле
 
-  let answer = await generate({
+  let answer =  generate({
     //создание ответа с учетом настроек каждой беседы
     wordsCount: getRandom(2, verbs),
     sampleSize: link,
     source: fs.readFileSync(sourcePath(Id)),
   });
+
+  console.log (answer);
 
   if (getRandom(1, 99) < procent) {
     //отправка ответа происходит только если процент ответов больше рандомного числа

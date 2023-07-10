@@ -1,7 +1,16 @@
 const { fileDict, fileProcent } = require("../core/tools.js");
 const fs = require("fs");
 
-const checkFiles = async (Id) => {
+const checkFiles = (Id) => {
+  fs.stat("cli/" + fileDict(Id), (err) => {
+    if (err) {
+      fs.writeFileSync(
+        "cli/" + fileDict(Id),
+        "Привет, меня зовут Малютка, я бот. "
+      );
+    } //слова
+  });
+  
   fs.stat("cli/" + fileProcent(Id), (err) => {
     if (err) {
       fs.writeFileSync(
@@ -11,13 +20,6 @@ const checkFiles = async (Id) => {
     } //процент
   });
 
-  fs.stat("cli/" + fileDict(Id), (err) => {
-    if (err) {
-      fs.writeFileSync(
-        "cli/" + fileDict(Id),
-        "Привет, меня зовут Малютка, я бот. "
-      );
-    } //слова
-  });
+  
 }; //создание файлов беседы
 exports.checkFiles = checkFiles;

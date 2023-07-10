@@ -1,9 +1,9 @@
-const { tokenize, accuracy } = require("./parser.js");
-const { range, pickRandom, upperone, getRandom } = require("./tools.js");
-const fs = require("fs");
-const translate = require('translate-google');
+const { tokenize } = require("./parser.js");
+const { range, pickRandom, getRandom } = require("./tools.js");
 const escapeString = (token) => `_+${token}`;
 const fromTokens = (tokens) => escapeString(tokens.join(""));
+const { reverselang }= require("./1.js")
+
 
 function sliceCorpus(corpus, sampleSize) {
   return corpus
@@ -49,7 +49,8 @@ function* generateChain(startText, transitions, sampleSize) {
   }
 }
 
- async function generate({ source, start = null, wordsCount, sampleSize } = {}) {
+
+  async function generate({ source, start = null, wordsCount, sampleSize } = {}) {
   if (sampleSize < 2) throw new Error("Размер должен быть не менее 2");
 
   const corpus = tokenize(String(source));
@@ -57,31 +58,22 @@ function* generateChain(startText, transitions, sampleSize) {
   const transitions = collectTransitions(samples);
 
   const generator = generateChain(start, transitions, sampleSize);
-  const chain = range(wordsCount).map((_) => generator.next().value);
+  let chain = range(wordsCount).map((_) => generator.next().value);
 
-  let answer = upperone(accuracy(chain).trimEnd());
-
-  console.log("3: " + answer);
-
-  if (answer.length - answer.lastIndexOf(" ") - 1 < 4) {
+  if (chain.length - chain.lastIndexOf(" ") - 1 < 4)  {
     let endWord;
     do {
       endWord = corpus[getRandom(0, corpus.length - 1)];
     } while (endWord.length < 4);
-    answer = answer + " " + endWord;
+    chain = chain + " " + endWord;
   }
+  console.log (chain);
+  
+  Promise.all (reverselang(chain));
 
-  console.log("final: " + answer + "\n");
+  console.log("final: " + chain + "\n");
 
-  let reverse;
-
-  await translate(answer, {to: 'en'}).then( resEn => { reverse = resEn });
-  await translate(reverse, {to: 'ru'}).then( resRu => { reverse = resRu });
-  console.log ("reverse: " + reverse);
-
-   answer = reverse.trimEnd() + ".";
-
-  return await answer;
 }
+
 
 exports.generate = generate;

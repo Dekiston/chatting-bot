@@ -1,7 +1,7 @@
 const getRandom = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min; //рандомное значение
 
-const upperone = (text) => text.charAt(0).toUpperCase() + text.slice(1); //Изменение регистра первой буквы^
+const upperone = (text) => {console.log (text);text.charAt(0).toUpperCase() + text.slice(1);} //Изменение регистра первой буквы^
 
 const pickRandom = (list) => list[getRandom(0, list.length - 1)]; //возращение случайного элемента массива
 

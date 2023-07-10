@@ -32,7 +32,7 @@ bot.hear(/^LINK.{2,4}$/i, (context) => {
 }); //изменение свявзи между словами
 
 bot.hear(/^CLEAR$/i, (context) => {
-  clear(context);
+  clear(context);k
 }); //удаление всех данных беседы
 
 bot.hear(/^Лс/i, (context) => {
